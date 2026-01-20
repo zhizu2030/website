@@ -5,7 +5,7 @@ main:
     # 要执行的任务
     - stages:
         - name: install-nodejs
-          script: curl -fsSL https://nodejs.org/dist/v18.19.0/node-v18.19.0-linux-x64.tar.xz | tar -xJf - && export PATH=$PWD/node-v18.19.0-linux-x64/bin:$PATH && node -v && npm -v
+          script: apt-get update && apt-get install -y nodejs npm && node -v && npm -v
         - name: install-dependencies
           script: npm install
         - name: build-project
