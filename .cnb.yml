@@ -1,0 +1,12 @@
+# 分支名
+main:
+  # 事件名
+  push:
+    # 要执行的任务
+    - stages:
+        - name: install-dependencies
+          script: npm install
+        - name: build-project
+          script: npm run build
+        - name: echo-success
+          script: echo "Build successful!"
