@@ -10,5 +10,7 @@ main:
           script: npm install
         - name: build-project
           script: npm run build
+        - name: deploy-static
+          script: echo "Deploying static website..." && ls -la dist/
         - name: echo-success
           script: echo "Build successful!"
