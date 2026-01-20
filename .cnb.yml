@@ -5,7 +5,7 @@ main:
     # 要执行的任务
     - stages:
         - name: install-nodejs
-          script: curl -fsSL https://fnm.vercel.app/install | bash && export PATH=$HOME/.local/share/fnm:$PATH && fnm use --install-if-missing 18 && node -v && npm -v
+          script: curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs && node -v && npm -v
         - name: install-dependencies
           script: npm install
         - name: build-project
