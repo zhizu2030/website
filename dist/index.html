@@ -5,6 +5,26 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>website</title>
+    <!-- 全域埋点代码 -->
+    <script src="https://app.beschannels.com/js-sdk/collect-1.0.1.min.js"></script>
+    <script>
+      window.myCollect = new window.Collect({
+        org_id: 'org3a9c6f10478fc97b1fc7118ca165f497',
+        event_props: {
+          source: '官网', // 来源信息
+        }, // 【非必填】
+        userFlag: {
+          PhoneNumber: '', // 手机号
+          Email: '', // 邮箱
+        } // 【非必填】，预置用户标识,需用户手动设置。
+      });
+      // 自动埋点开启
+      window.myCollect.init({
+        page_view_auto: true, // 页面浏览自动上报开关，默认开启true
+        element_click_auto: false, // 点击事件自动上报开关，默认关闭false。
+      });
+    </script>
+    <!-- 全域埋点代码结束 -->
     <script type="module" crossorigin src="/assets/index-Cyfq8sfo.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-D1We2FDj.css">
   </head>
