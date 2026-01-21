@@ -178,6 +178,14 @@ const FreeTrial: React.FC = () => {
     const source = getCookie('source') || 'unknown';
     
     try {
+      // 设置用户标识
+      if (window.myCollect) {
+        window.myCollect.$setUserFlag({
+          PhoneNumber: formData.phone
+        });
+        console.log('设置用户标识成功:', { PhoneNumber: formData.phone });
+      }
+      
       // 1. 获取access_token
       console.log('开始获取access_token...');
       const accessToken = await getAccessToken();
