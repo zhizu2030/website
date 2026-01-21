@@ -4,6 +4,20 @@ import { useLocation } from 'react-router-dom';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
 
+// 扩展Window接口，添加myCollect类型定义
+declare global {
+  interface Window {
+    myCollect?: {
+      $setUserFlag: (data: {
+        PhoneNumber?: string;
+        Email?: string;
+        UnionID?: string;
+        OpenID?: string;
+      }) => void;
+    };
+  }
+}
+
 // Cookie 操作工具函数
 const setCookie = (name: string, value: string, days: number = 7) => {
   const expires = new Date();
