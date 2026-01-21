@@ -27,6 +27,90 @@ const getCookie = (name: string) => {
   return '';
 };
 
+// 生成唯一ID函数
+const generateUniqueId = (): string => {
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substr(2, 9);
+  const uniqueId = `web_${timestamp}_${randomStr}`.toUpperCase();
+  return uniqueId;
+};
+
+// 生成用户ID函数
+const generateUserId = (): string => {
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substr(2, 12);
+  return `user${timestamp}${randomStr}`;
+};
+
+// 获取access_token函数
+const getAccessToken = async (): Promise<string> => {
+  const response = await fetch('https://openapi.beschannels.com/api/get-access-token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      appId: 'zq_7571ef5c',
+      appSecret: '1BF65AC3CD368228E1A0062BCCFF7069',
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`获取token失败: ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (data.code !== 0) {
+    throw new Error(`获取token失败: ${data.msg}`);
+  }
+
+  return data.data.access_token;
+};
+
+// 同步数据函数
+const syncData = async (accessToken: string, formData: any) => {
+  const userId = generateUserId();
+  const websiteId = generateUniqueId();
+  const createdTime = new Date().toLocaleString('zh-CN');
+
+  const response = await fetch(`https://openapi.beschannels.com/leads/open-api/next-list?access_token=${accessToken}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      nextId: Math.floor(Math.random() * 10000).toString(),
+      data: {
+        PhoneNumber: formData.phone,
+        Name: formData.name,
+        Email: formData.email,
+        Company: formData.company,
+        CreatedTime: createdTime,
+        WebsiteID: websiteId,
+        Remark: formData.message || '无',
+        Industry: formData.industry,
+      },
+      client_type: 'externalDataSource',
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`同步数据失败: ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (data.code !== 0) {
+    throw new Error(`同步数据失败: ${data.msg}`);
+    }
+
+  return {
+    success: true,
+    userId,
+    websiteId,
+  };
+};
+
 const FreeTrial: React.FC = () => {
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -39,6 +123,7 @@ const FreeTrial: React.FC = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // 从URL查询参数中获取来源信息并存储到Cookie
   useEffect(() => {
@@ -52,23 +137,42 @@ const FreeTrial: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     
     // 从Cookie中获取来源信息
     const source = getCookie('source') || 'unknown';
     
-    // 模拟表单提交
-    setTimeout(() => {
+    try {
+      // 1. 获取access_token
+      console.log('开始获取access_token...');
+      const accessToken = await getAccessToken();
+      console.log('获取access_token成功:', accessToken);
+      
+      // 2. 同步数据
+      console.log('开始同步数据...');
+      const syncResult = await syncData(accessToken, formData);
+      console.log('同步数据成功:', syncResult);
+      
+      // 3. 记录提交数据
       console.log('表单提交数据:', {
         ...formData,
         source,
-        submittedAt: new Date().toISOString()
+        submittedAt: new Date().toISOString(),
+        websiteId: syncResult.websiteId,
+        userId: syncResult.userId,
       });
+      
+      // 4. 显示成功信息
       setLoading(false);
       setSubmitted(true);
-    }, 1500);
+    } catch (err) {
+      console.error('提交失败:', err);
+      setError(err instanceof Error ? err.message : '提交失败，请稍后重试');
+      setLoading(false);
+    }
   };
 
   const industries = [
@@ -102,7 +206,26 @@ const FreeTrial: React.FC = () => {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
-              {submitted ? (
+              {error ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="bg-red-50 rounded-xl p-12 text-center"
+                >
+                  <div className="text-6xl mb-6">❌</div>
+                  <h2 className="text-3xl font-bold mb-4">提交失败</h2>
+                  <p className="text-lg text-gray-600 mb-8">
+                    {error}
+                  </p>
+                  <button
+                    onClick={() => setError(null)}
+                    className="btn btn-primary"
+                  >
+                    重试
+                  </button>
+                </motion.div>
+              ) : submitted ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
