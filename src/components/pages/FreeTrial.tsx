@@ -47,7 +47,7 @@ const getAccessToken = async (): Promise<string> => {
   try {
     console.log('开始调用获取token API...');
     // 使用Vite代理避免CORS问题
-    const response = await fetch('/api/get-access-token', {
+    const response = await fetch('/api/api/get-access-token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ const syncData = async (accessToken: string, formData: any) => {
   try {
     const userId = generateUserId();
     const websiteId = generateUniqueId();
-    const createdTime = new Date().toLocaleString('zh-CN');
+    const createdTime = new Date().toLocaleString('zh-CN').replace(/\//g, '-');
 
     console.log('开始调用同步数据 API...');
     console.log('同步数据 API参数:', {
@@ -95,14 +95,14 @@ const syncData = async (accessToken: string, formData: any) => {
     });
 
     // 使用Vite代理避免CORS问题
-    const response = await fetch(`/api/leads/open-api/next-list?access_token=${accessToken}`, {
+    const response = await fetch(`/api/leads/open-api/customers-add?access_token=${accessToken}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        user_id: userId,
-        nextId: Math.floor(Math.random() * 10000).toString(),
+        user_id: 'user28df4407155d8f4089713979717b066e',
+        nextId: '4743',
         data: {
           PhoneNumber: formData.phone,
           Name: formData.name,

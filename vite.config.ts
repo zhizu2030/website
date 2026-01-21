@@ -9,7 +9,7 @@ export default defineConfig({
       '/api': {
         target: 'https://openapi.beschannels.com',
         changeOrigin: true,
-        // 不需要重写路径，因为我们要保持/api前缀
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
