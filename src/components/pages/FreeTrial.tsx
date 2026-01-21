@@ -44,71 +44,103 @@ const generateUserId = (): string => {
 
 // 获取access_token函数
 const getAccessToken = async (): Promise<string> => {
-  const response = await fetch('https://openapi.beschannels.com/api/get-access-token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      appId: 'zq_7571ef5c',
-      appSecret: '1BF65AC3CD368228E1A0062BCCFF7069',
-    }),
-  });
+  try {
+    console.log('开始调用获取token API...');
+    // 使用Vite代理避免CORS问题
+    const response = await fetch('/api/get-access-token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        appId: 'zq_7571ef5c',
+        appSecret: '1BF65AC3CD368228E1A0062BCCFF7069',
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`获取token失败: ${response.status}`);
+    console.log('获取token API响应状态:', response.status);
+    console.log('获取token API响应头:', Object.fromEntries(response.headers));
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('获取token API错误响应:', errorText);
+      throw new Error(`获取token失败: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('获取token API响应数据:', data);
+
+    if (data.code !== 0) {
+      throw new Error(`获取token失败: ${data.msg}`);
+    }
+
+    return data.data.access_token;
+  } catch (error) {
+    console.error('获取token失败:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  if (data.code !== 0) {
-    throw new Error(`获取token失败: ${data.msg}`);
-  }
-
-  return data.data.access_token;
 };
 
 // 同步数据函数
 const syncData = async (accessToken: string, formData: any) => {
-  const userId = generateUserId();
-  const websiteId = generateUniqueId();
-  const createdTime = new Date().toLocaleString('zh-CN');
+  try {
+    const userId = generateUserId();
+    const websiteId = generateUniqueId();
+    const createdTime = new Date().toLocaleString('zh-CN');
 
-  const response = await fetch(`https://openapi.beschannels.com/leads/open-api/next-list?access_token=${accessToken}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      user_id: userId,
-      nextId: Math.floor(Math.random() * 10000).toString(),
-      data: {
-        PhoneNumber: formData.phone,
-        Name: formData.name,
-        Email: formData.email,
-        Company: formData.company,
-        CreatedTime: createdTime,
-        WebsiteID: websiteId,
-        Remark: formData.message || '无',
-        Industry: formData.industry,
+    console.log('开始调用同步数据 API...');
+    console.log('同步数据 API参数:', {
+      accessToken: accessToken.substring(0, 20) + '...',
+      formData: formData,
+    });
+
+    // 使用Vite代理避免CORS问题
+    const response = await fetch(`/api/leads/open-api/next-list?access_token=${accessToken}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      client_type: 'externalDataSource',
-    }),
-  });
+      body: JSON.stringify({
+        user_id: userId,
+        nextId: Math.floor(Math.random() * 10000).toString(),
+        data: {
+          PhoneNumber: formData.phone,
+          Name: formData.name,
+          Email: formData.email,
+          Company: formData.company,
+          CreatedTime: createdTime,
+          WebsiteID: websiteId,
+          Remark: formData.message || '无',
+          Industry: formData.industry,
+        },
+        client_type: 'externalDataSource',
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`同步数据失败: ${response.status}`);
-  }
+    console.log('同步数据 API响应状态:', response.status);
 
-  const data = await response.json();
-  if (data.code !== 0) {
-    throw new Error(`同步数据失败: ${data.msg}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('同步数据 API错误响应:', errorText);
+      throw new Error(`同步数据失败: ${response.status} - ${errorText}`);
     }
 
-  return {
-    success: true,
-    userId,
-    websiteId,
-  };
+    const data = await response.json();
+    console.log('同步数据 API响应数据:', data);
+
+    if (data.code !== 0) {
+      throw new Error(`同步数据失败: ${data.msg}`);
+    }
+
+    return {
+      success: true,
+      userId,
+      websiteId,
+    };
+  } catch (error) {
+    console.error('同步数据失败:', error);
+    throw error;
+  }
 };
 
 const FreeTrial: React.FC = () => {
