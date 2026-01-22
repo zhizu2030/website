@@ -73,6 +73,8 @@ const getAccessToken = async (): Promise<string> => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': '*/*',
+        'Origin': isProduction ? 'https://website-iota-five-13.vercel.app' : 'http://localhost:5173',
       },
       body: JSON.stringify({
         appId: 'zq_7571ef5c',
@@ -121,6 +123,8 @@ const syncData = async (accessToken: string, formData: any) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': '*/*',
+        'Origin': isProduction ? 'https://website-iota-five-13.vercel.app' : 'http://localhost:5173',
       },
       body: JSON.stringify({
         user_id: 'user28df4407155d8f4089713979717b066e',
