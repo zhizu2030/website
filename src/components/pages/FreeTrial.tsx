@@ -56,8 +56,8 @@ const generateUserId = (): string => {
   return `user${timestamp}${randomStr}`;
 };
 
-// 获取当前环境
-const isProduction = import.meta.env.PROD;
+// 检测生产环境的更可靠方法
+const isProduction = typeof window !== 'undefined' && window.location.hostname === 'website-iota-five-13.vercel.app';
 // API基础地址
 const API_BASE_URL = isProduction ? '/api/proxy' : '/api';
 
