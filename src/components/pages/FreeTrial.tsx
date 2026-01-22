@@ -56,12 +56,20 @@ const generateUserId = (): string => {
   return `user${timestamp}${randomStr}`;
 };
 
+// 获取当前环境
+const isProduction = import.meta.env.PROD;
+// API基础地址
+const API_BASE_URL = isProduction ? 'https://openapi.beschannels.com' : '/api';
+
 // 获取access_token函数
 const getAccessToken = async (): Promise<string> => {
   try {
     console.log('开始调用获取token API...');
-    // 使用Vite代理避免CORS问题
-    const response = await fetch('/api/api/get-access-token', {
+    console.log('当前环境:', isProduction ? 'production' : 'development');
+    console.log('API基础地址:', API_BASE_URL);
+    
+    // 使用正确的API地址
+    const response = await fetch(`${API_BASE_URL}/api/get-access-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -108,8 +116,8 @@ const syncData = async (accessToken: string, formData: any) => {
       formData: formData,
     });
 
-    // 使用Vite代理避免CORS问题
-    const response = await fetch(`/api/leads/open-api/customers-add?access_token=${accessToken}`, {
+    // 使用正确的API地址
+    const response = await fetch(`${API_BASE_URL}/leads/open-api/customers-add?access_token=${accessToken}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
