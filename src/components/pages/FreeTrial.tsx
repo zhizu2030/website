@@ -59,7 +59,7 @@ const generateUserId = (): string => {
 // 获取当前环境
 const isProduction = import.meta.env.PROD;
 // API基础地址
-const API_BASE_URL = isProduction ? 'https://openapi.beschannels.com' : '/api';
+const API_BASE_URL = isProduction ? '/api/proxy' : '/api';
 
 // 获取access_token函数
 const getAccessToken = async (): Promise<string> => {
@@ -73,8 +73,6 @@ const getAccessToken = async (): Promise<string> => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': '*/*',
-        'Origin': isProduction ? 'https://website-iota-five-13.vercel.app' : 'http://localhost:5173',
       },
       body: JSON.stringify({
         appId: 'zq_7571ef5c',
@@ -123,8 +121,6 @@ const syncData = async (accessToken: string, formData: any) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': '*/*',
-        'Origin': isProduction ? 'https://website-iota-five-13.vercel.app' : 'http://localhost:5173',
       },
       body: JSON.stringify({
         user_id: 'user28df4407155d8f4089713979717b066e',
