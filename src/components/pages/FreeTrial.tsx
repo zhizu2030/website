@@ -56,16 +56,13 @@ const generateUserId = (): string => {
   return `user${timestamp}${randomStr}`;
 };
 
-// 检测生产环境的更可靠方法
-const isProduction = typeof window !== 'undefined' && window.location.hostname === 'website-iota-five-13.vercel.app';
-// API基础地址
-const API_BASE_URL = isProduction ? '/api/proxy' : '/api';
+// API基础地址 - 直接使用实际的API地址
+const API_BASE_URL = 'https://openapi.beschannels.com';
 
 // 获取access_token函数
 const getAccessToken = async (): Promise<string> => {
   try {
     console.log('开始调用获取token API...');
-    console.log('当前环境:', isProduction ? 'production' : 'development');
     console.log('API基础地址:', API_BASE_URL);
     
     // 使用正确的API地址
