@@ -56,8 +56,8 @@ const generateUserId = (): string => {
   return `user${timestamp}${randomStr}`;
 };
 
-// API基础地址 - 直接使用实际的API地址
-const API_BASE_URL = 'https://openapi.beschannels.com';
+// API基础地址 - 使用Vercel API路由代理
+const API_BASE_URL = '/api/proxy';
 
 // 获取access_token函数
 const getAccessToken = async (): Promise<string> => {
