@@ -56,13 +56,18 @@ const generateUserId = (): string => {
   return `user${timestamp}${randomStr}`;
 };
 
-// API基础地址 - 使用Vercel API路由代理
-const API_BASE_URL = '/api/proxy';
+// 检测当前环境
+const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+const isProduction = typeof window !== 'undefined' && window.location.hostname === 'website-iota-five-13.vercel.app';
+
+// API基础地址 - 根据环境使用不同的代理
+const API_BASE_URL = isDevelopment || isProduction ? '/api/proxy' : 'https://openapi.beschannels.com';
 
 // 获取access_token函数
 const getAccessToken = async (): Promise<string> => {
   try {
     console.log('开始调用获取token API...');
+    console.log('当前环境:', isDevelopment ? 'development' : isProduction ? 'production' : 'other');
     console.log('API基础地址:', API_BASE_URL);
     
     // 使用正确的API地址
